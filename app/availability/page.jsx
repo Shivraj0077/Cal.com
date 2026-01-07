@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState} from 'react';
 
 export default function AvailabilityPage() {
     const [weekly, setWeekly] = useState([]);
@@ -10,6 +10,20 @@ export default function AvailabilityPage() {
         startTime: '',
         endTime: ''
     });
+
+    function formatTime(timeStr){
+        if(!timeStr) '';
+        const [hour, minute] = timeStr.split(":");
+        const date = new Date()
+        date.setHours(hour);
+        date.setMinutes(minute);
+
+        return date.toLocaleTimeString([], {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+        })
+    }
 
     async function fetchData() {
         const token = localStorage.getItem('token');
@@ -103,7 +117,7 @@ export default function AvailabilityPage() {
             <ul>
                 {weekly.map(r => (
                     <li key={r.id}>
-                        Day {r.day_of_week}: {r.start_time} – {r.end_time}
+                        Day {r.day_of_week}: {formatTime(r.start_time)} – {formatTime(r.end_time)}
                     </li>
                 ))}
             </ul>
