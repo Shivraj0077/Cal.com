@@ -111,11 +111,11 @@ BookWise follows a clean, monolithic architecture. The complexity comes from log
                     ┌────────────┴──────────────┐
                     ▼                           ▼
          ┌────────────────────┐    ┌──────────────────┐
-         │  Background Workers │    │  Event Pipeline  │
-         │                     │    │                  │
-         │ • Auto-Expiration   │    │ • Outbox Pattern │
-         │ • Cleanup Jobs      │    │ • Webhooks       │
-         │ • Cron Scheduling   │    │ • Retry Logic    │
+         │  Background Workers│    │  Event Pipeline  │
+         │                    │    │                  │
+         │ • Auto-Expiration  │    │ • Outbox Pattern │
+         │ • Cleanup Jobs     │    │ • Webhooks       │
+         │ • Cron Scheduling  │    │ • Retry Logic    │
          └────────────────────┘    └──────────────────┘
 ```
 
