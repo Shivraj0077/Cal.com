@@ -21,7 +21,13 @@ export default function LoginPage() {
     setLoading(false);
     if (!res.ok) { setError(data.error || 'Login failed'); return; }
     localStorage.setItem('token', data.token);
-    router.push('/event-types');
+    localStorage.setItem('user', JSON.stringify(data.user)); // Store user info for role checks
+    
+    if (data.user.role === 'HOST') {
+      router.push('/event-types');
+    } else {
+      router.push('/dashboard');
+    }
   }
 
   return (

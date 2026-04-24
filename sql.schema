@@ -1,45 +1,15 @@
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
+-- 1. Create Users first (referenced by everything else)
+CREATE TABLE public.users (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  username text NOT NULL UNIQUE,
+  password_hash text NOT NULL,
+  role text NOT NULL CHECK (role = ANY (ARRAY['HOST'::text, 'BOOKER'::text])),
+  timezone text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT users_pkey PRIMARY KEY (id)
+);
 
-CREATE TABLE public.availability_rules (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  host_id uuid,
-  day_of_week integer CHECK (day_of_week >= 0 AND day_of_week <= 6),
-  start_time time without time zone NOT NULL,
-  end_time time without time zone NOT NULL,
-  timezone text NOT NULL,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT availability_rules_pkey PRIMARY KEY (id),
-  CONSTRAINT availability_rules_host_id_fkey FOREIGN KEY (host_id) REFERENCES public.users(id)
-);
-CREATE TABLE public.bookings (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  host_id uuid NOT NULL,
-  date date NOT NULL,
-  start_time time without time zone NOT NULL,
-  end_time time without time zone NOT NULL,
-  status text NOT NULL CHECK (status = ANY (ARRAY['confirmed'::text, 'cancelled'::text])),
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  guest_name text NOT NULL,
-  guest_email text NOT NULL,
-  duration integer NOT NULL,
-  event_type_id uuid,
-  CONSTRAINT bookings_pkey PRIMARY KEY (id),
-  CONSTRAINT fk_booking_host FOREIGN KEY (host_id) REFERENCES public.users(id),
-  CONSTRAINT bookings_event_type_id_fkey FOREIGN KEY (event_type_id) REFERENCES public.event_types(id)
-);
-CREATE TABLE public.date_overrides (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  host_id uuid,
-  date date NOT NULL,
-  is_available boolean NOT NULL,
-  start_time time without time zone,
-  end_time time without time zone,
-  timezone text NOT NULL,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT date_overrides_pkey PRIMARY KEY (id),
-  CONSTRAINT date_overrides_host_id_fkey FOREIGN KEY (host_id) REFERENCES public.users(id)
-);
+-- 2. Create Event Types (referenced by bookings)
 CREATE TABLE public.event_types (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   host_id uuid NOT NULL,
@@ -53,14 +23,51 @@ CREATE TABLE public.event_types (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT event_types_pkey PRIMARY KEY (id),
-  CONSTRAINT event_types_host_id_fkey FOREIGN KEY (host_id) REFERENCES public.users(id)
+  CONSTRAINT event_types_host_id_fkey FOREIGN KEY (host_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
-CREATE TABLE public.users (
+
+-- 3. Create Availability Rules
+CREATE TABLE public.availability_rules (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  username text NOT NULL,
-  password_hash text NOT NULL,
-  role text NOT NULL CHECK (role = ANY (ARRAY['HOST'::text, 'BOOKER'::text])),
+  host_id uuid NOT NULL,
+  day_of_week integer CHECK (day_of_week >= 0 AND day_of_week <= 6),
+  start_time_utc time without time zone NOT NULL,
+  end_time_utc time without time zone NOT NULL,
   timezone text NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT users_pkey PRIMARY KEY (id)
+  CONSTRAINT availability_rules_pkey PRIMARY KEY (id),
+  CONSTRAINT availability_rules_host_id_fkey FOREIGN KEY (host_id) REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+-- 4. Create Date Overrides
+CREATE TABLE public.date_overrides (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  host_id uuid NOT NULL,
+  date date NOT NULL,
+  is_available boolean NOT NULL,
+  start_time_utc time without time zone,
+  end_time_utc time without time zone,
+  timezone text NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT date_overrides_pkey PRIMARY KEY (id),
+  CONSTRAINT date_overrides_host_id_fkey FOREIGN KEY (host_id) REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+-- 5. Create Bookings (references both users and event_types)
+CREATE TABLE public.bookings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  host_id uuid NOT NULL,
+  event_type_id uuid NOT NULL,
+  date date NOT NULL,
+  start_time_utc time without time zone NOT NULL,
+  end_time_utc time without time zone NOT NULL,
+  status text NOT NULL DEFAULT 'confirmed' CHECK (status = ANY (ARRAY['confirmed'::text, 'cancelled'::text])),
+  guest_name text NOT NULL,
+  guest_email text NOT NULL,
+  duration integer NOT NULL,
+  booker_timezone text DEFAULT 'UTC',
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT bookings_pkey PRIMARY KEY (id),
+  CONSTRAINT fk_booking_host FOREIGN KEY (host_id) REFERENCES public.users(id) ON DELETE CASCADE,
+  CONSTRAINT bookings_event_type_id_fkey FOREIGN KEY (event_type_id) REFERENCES public.event_types(id) ON DELETE CASCADE
 );

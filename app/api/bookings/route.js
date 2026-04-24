@@ -129,16 +129,24 @@ export async function POST(req) {
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const hostId = searchParams.get('hostId');
+    const guestEmail = searchParams.get('guestEmail');
     const date = searchParams.get('date');
 
-    if (!hostId) {
-        return NextResponse.json({ error: 'hostId is required' }, { status: 400 });
+    if (!hostId && !guestEmail) {
+        return NextResponse.json({ error: 'hostId or guestEmail is required' }, { status: 400 });
     }
 
     let query = supabase
         .from('bookings')
-        .select('*, event_types(title, duration, buffer_before_min, buffer_after_min)')
-        .eq('host_id', hostId);
+        .select('*, event_types(title, duration, buffer_before_min, buffer_after_min), users:host_id(username, timezone)');
+
+    if (hostId) {
+        query = query.eq('host_id', hostId);
+    }
+    
+    if (guestEmail) {
+        query = query.eq('guest_email', guestEmail);
+    }
 
     if (date) {
         query = query.eq('date', date);
