@@ -36,7 +36,7 @@ export default function MyBookingsPage() {
             setLoading(false);
         }
         fetchBookings();
-    }, []);
+    },);
 
     return (
         <div className="shell">
@@ -56,7 +56,7 @@ export default function MyBookingsPage() {
                         ) : bookings.length === 0 ? (
                             <div className="empty">
                                 <div className="empty-title">No bookings found</div>
-                                <div className="empty-desc">You haven &aspos t scheduled any meetings yet.</div>
+                                <div className="empty-desc">You haven&apos;t scheduled any meetings yet.</div>
                             </div>
                         ) : (
                             <div style={{ padding: '0 20px' }}>
