@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '@/app/components/Sidebar';
 
 const DAYS = [

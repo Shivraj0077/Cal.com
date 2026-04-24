@@ -62,7 +62,7 @@ export default function LoginPage() {
         </div>
 
         <div className="auth-footer">
-          Don &aspos t have an account?{' '}
+          Don&apos;t have an account?{' '}
           <button onClick={() => router.push('/signUp')}>Create one</button>
         </div>
       </div>

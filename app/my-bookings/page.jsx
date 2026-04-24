@@ -5,14 +5,20 @@ import Sidebar from '@/app/components/Sidebar';
 export default function MyBookingsPage() {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [user] = useState(() => {
+        if (typeof window === 'undefined') return null;
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try { return JSON.parse(storedUser); } catch (e) { return null; }
+        }
+        return null;
+    });
 
     useEffect(() => {
         async function fetchBookings() {
             const token = localStorage.getItem('token');
-            const storedUser = localStorage.getItem('user');
-            if (!token || !storedUser) return;
+            if (!token || !user) return;
 
-            const user = JSON.parse(storedUser);
             // In this prototype, we're assuming the booker's email is their username or we can fetch it.
             // Since our SignUp doesn't ask for email, we'll use a placeholder or assume username is email for now.
             // Ideally, we'd add an email field to the user table.
@@ -50,7 +56,7 @@ export default function MyBookingsPage() {
                         ) : bookings.length === 0 ? (
                             <div className="empty">
                                 <div className="empty-title">No bookings found</div>
-                                <div className="empty-desc">You haven't scheduled any meetings yet.</div>
+                                <div className="empty-desc">You haven &aspos t scheduled any meetings yet.</div>
                             </div>
                         ) : (
                             <div style={{ padding: '0 20px' }}>

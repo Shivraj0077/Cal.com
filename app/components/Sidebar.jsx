@@ -20,18 +20,14 @@ const FOOTER_ITEMS = [
 export default function Sidebar({ username = 'User' }) {
     const router = useRouter();
     const pathname = usePathname();
-    const [user, setUser] = useState(null);
-
-    useEffect(() => {
+    const [user, setUser] = useState(() => {
+        if (typeof window === 'undefined') return null;
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-            try {
-                setUser(JSON.parse(storedUser));
-            } catch (e) {
-                console.error("Failed to parse user", e);
-            }
+            try { return JSON.parse(storedUser); } catch (e) { return null; }
         }
-    }, []);
+        return null;
+    });
 
     function logout() {
         localStorage.removeItem('token');
