@@ -67,13 +67,9 @@ export default function AvailabilityPage() {
         <div className="shell">
             <Sidebar />
             <main className="main">
-                <div className="breadcrumb">
-                    Home <span>/</span> Settings <span>/</span> <span>Working Hours</span>
-                </div>
+                
 
-                <div className="page-header">
-                    Settings / Working Hours
-                </div>
+               
 
                 <div className="page-header" style={{ marginBottom: 32 }}>
                     <div>
