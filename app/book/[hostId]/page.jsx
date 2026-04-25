@@ -142,7 +142,7 @@ export default function BookingPage({ params }) {
                             {!loading && slots.length > 0 && (
                                 <div className="slot-grid">
                                     {slots.map((slot, i) => (
-                                        <button key={i} className="slot-btn" onClick={() => setSelectedSlot(slot)}>{fmt(slot.start)}</button>
+                                        <button key={i} className="slot-btn" onClick={() => setSelectedSlot(slot)}>{fmt(slot.start)} - {fmt(slot.end)}</button>
                                     ))}
                                 </div>
                             )}

@@ -32,6 +32,7 @@ export default function Sidebar() {
     const initials = nameToDisplay.slice(0, 2).toUpperCase();
 
     const HOST_NAV = [
+        { href: '/dashboard', icon: '', label: 'Dashboard' },
         { href: '/event-types', icon: '', label: 'Event types' },
         { href: '/my-bookings', icon: '', label: 'Bookings' },
         { href: '/availability', icon: '', label: 'Availability' },
